@@ -1,0 +1,273 @@
+apiVersion: 1
+
+groups:
+  - orgId: 1
+    name: api
+    folder: Observability Alerts
+    interval: 1m
+    rules:
+      - uid: alert-api-down
+        title: API fora do ar (blackbox)
+        condition: C
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: A API não está respondendo 2xx na raiz ({{ $labels.instance }}).
+        noDataState: Alerting
+        execErrState: Error
+        data:
+          - refId: A
+            relativeTimeRange: {from: 300, to: 0}
+            datasourceUid: prometheus
+            model:
+              datasource: {type: prometheus, uid: prometheus}
+              expr: 'probe_success{endpoint_type="root"}'
+              instant: true
+              refId: A
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              datasource: {type: __expr__, uid: __expr__}
+              type: classic_conditions
+              refId: C
+              conditions:
+                - type: query
+                  evaluator: {type: lt, params: [1]}
+                  operator: {type: and}
+                  query: {params: [A]}
+                  reducer: {type: last, params: []}
+
+      - uid: alert-api-ready
+        title: API readiness degradada
+        condition: C
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: O endpoint {{ $labels.instance }} não retorna 200.
+        noDataState: Alerting
+        execErrState: Error
+        data:
+          - refId: A
+            relativeTimeRange: {from: 300, to: 0}
+            datasourceUid: prometheus
+            model:
+              datasource: {type: prometheus, uid: prometheus}
+              expr: 'probe_success{endpoint_type="ready"}'
+              instant: true
+              refId: A
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              datasource: {type: __expr__, uid: __expr__}
+              type: classic_conditions
+              refId: C
+              conditions:
+                - type: query
+                  evaluator: {type: lt, params: [1]}
+                  operator: {type: and}
+                  query: {params: [A]}
+                  reducer: {type: last, params: []}
+
+      - uid: alert-api-5xx
+        title: Taxa de erro 5xx alta (> 5%)
+        condition: C
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: Mais de 5% das requisições estão retornando 5xx nos últimos 5 minutos.
+        noDataState: OK
+        execErrState: OK
+        data:
+          - refId: A
+            relativeTimeRange: {from: 600, to: 0}
+            datasourceUid: prometheus
+            model:
+              datasource: {type: prometheus, uid: prometheus}
+              expr: '100 * sum(rate(http_request_duration_seconds_count{status_code=~"5.."}[5m])) / clamp_min(sum(rate(http_request_duration_seconds_count[5m])), 1)'
+              instant: true
+              refId: A
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              datasource: {type: __expr__, uid: __expr__}
+              type: classic_conditions
+              refId: C
+              conditions:
+                - type: query
+                  evaluator: {type: gt, params: [5]}
+                  operator: {type: and}
+                  query: {params: [A]}
+                  reducer: {type: last, params: []}
+
+      - uid: alert-api-latency
+        title: Latência p95 alta (> 1s)
+        condition: C
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: A latência p95 das requisições passou de 1s nos últimos 10 minutos.
+        noDataState: OK
+        execErrState: OK
+        data:
+          - refId: A
+            relativeTimeRange: {from: 600, to: 0}
+            datasourceUid: prometheus
+            model:
+              datasource: {type: prometheus, uid: prometheus}
+              expr: 'histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket[5m])) by (le))'
+              instant: true
+              refId: A
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              datasource: {type: __expr__, uid: __expr__}
+              type: classic_conditions
+              refId: C
+              conditions:
+                - type: query
+                  evaluator: {type: gt, params: [1]}
+                  operator: {type: and}
+                  query: {params: [A]}
+                  reducer: {type: last, params: []}
+
+  - orgId: 1
+    name: box
+    folder: Observability Alerts
+    interval: 1m
+    rules:
+      - uid: alert-box-disk
+        title: Disco do host acima de 85%
+        condition: C
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: O uso do disco raiz passou de 85%.
+        noDataState: OK
+        execErrState: OK
+        data:
+          - refId: A
+            relativeTimeRange: {from: 300, to: 0}
+            datasourceUid: prometheus
+            model:
+              datasource: {type: prometheus, uid: prometheus}
+              expr: '100 - (node_filesystem_avail_bytes{mountpoint="/",fstype!="tmpfs"} / node_filesystem_size_bytes{mountpoint="/",fstype!="tmpfs"} * 100)'
+              instant: true
+              refId: A
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              datasource: {type: __expr__, uid: __expr__}
+              type: classic_conditions
+              refId: C
+              conditions:
+                - type: query
+                  evaluator: {type: gt, params: [85]}
+                  operator: {type: and}
+                  query: {params: [A]}
+                  reducer: {type: last, params: []}
+
+      - uid: alert-box-mem
+        title: Memória disponível do host baixa (< 10%)
+        condition: C
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: Menos de 10% da memória do host está disponível.
+        noDataState: OK
+        execErrState: OK
+        data:
+          - refId: A
+            relativeTimeRange: {from: 300, to: 0}
+            datasourceUid: prometheus
+            model:
+              datasource: {type: prometheus, uid: prometheus}
+              expr: 'node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes * 100'
+              instant: true
+              refId: A
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              datasource: {type: __expr__, uid: __expr__}
+              type: classic_conditions
+              refId: C
+              conditions:
+                - type: query
+                  evaluator: {type: lt, params: [10]}
+                  operator: {type: and}
+                  query: {params: [A]}
+                  reducer: {type: last, params: []}
+
+  - orgId: 1
+    name: telemetria
+    folder: Observability Alerts
+    interval: 1m
+    rules:
+      - uid: alert-traces-stopped
+        title: Ingestão de traces parada
+        condition: C
+        for: 15m
+        labels:
+          severity: warning
+        annotations:
+          summary: O Tempo não recebe spans há 15 minutos. Verifique a instrumentação OTLP da API.
+        noDataState: Alerting
+        execErrState: Error
+        data:
+          - refId: A
+            relativeTimeRange: {from: 900, to: 0}
+            datasourceUid: prometheus
+            model:
+              datasource: {type: prometheus, uid: prometheus}
+              expr: 'sum(rate(traces_spanmetrics_calls_total[15m]))'
+              instant: true
+              refId: A
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              datasource: {type: __expr__, uid: __expr__}
+              type: classic_conditions
+              refId: C
+              conditions:
+                - type: query
+                  evaluator: {type: lt, params: [0.001]}
+                  operator: {type: and}
+                  query: {params: [A]}
+                  reducer: {type: last, params: []}
+
+      - uid: alert-logs-stopped
+        title: Ingestão de logs parada
+        condition: C
+        for: 15m
+        labels:
+          severity: warning
+        annotations:
+          summary: O Loki não recebe logs do serviço há 15 minutos.
+        noDataState: Alerting
+        execErrState: Error
+        data:
+          - refId: A
+            relativeTimeRange: {from: 900, to: 0}
+            datasourceUid: loki
+            model:
+              datasource: {type: loki, uid: loki}
+              expr: 'sum(count_over_time({service_name="${LOKI_SERVICE_NAME}"} [15m]))'
+              queryType: instant
+              refId: A
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              datasource: {type: __expr__, uid: __expr__}
+              type: classic_conditions
+              refId: C
+              conditions:
+                - type: query
+                  evaluator: {type: lt, params: [0.001]}
+                  operator: {type: and}
+                  query: {params: [A]}
+                  reducer: {type: last, params: []}
