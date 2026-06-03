@@ -1,0 +1,5 @@
+.env
+api/node_modules/
+api/dist/
+api/coverage/
+generator/node_modules/
