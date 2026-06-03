@@ -3,7 +3,9 @@ import type { Histogram } from "prom-client";
 import { recordMetric } from "../lib/recordMetric";
 
 function resolveRoute(req: Request): string {
-  return (req.route as { path?: string } | undefined)?.path ?? req.path;
+  // Sem rota casada (ex.: 404), usar um valor fixo evita explosão de
+  // cardinalidade no histograma com caminhos arbitrários de scanners.
+  return (req.route as { path?: string } | undefined)?.path ?? "unmatched";
 }
 
 export function buildMetricsMiddleware(histogram: Histogram): RequestHandler {

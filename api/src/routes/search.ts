@@ -2,14 +2,13 @@ import { Router } from "express";
 import type { Request, Response } from "express";
 import { simulateDelay } from "../lib/simulateDelay";
 import { shouldFail } from "../lib/simulateError";
+import { errorRate } from "../lib/errorRate";
 
 export const searchRouter = Router();
 
-const ERROR_RATE = parseFloat(process.env.ERROR_RATE ?? "0.05");
-
 searchRouter.get("/search", async (req: Request, res: Response): Promise<void> => {
   await simulateDelay(50, 600);
-  if (shouldFail(ERROR_RATE)) {
+  if (shouldFail(errorRate)) {
     res.status(500).json({ error: "internal server error" });
     return;
   }

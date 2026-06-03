@@ -350,7 +350,7 @@ Conteúdo do `.env`:
 GRAFANA_ADMIN_USER=admin
 GRAFANA_ADMIN_PASSWORD=admin
 
-# Nome do serviço reportado nos traces e usado pelo alerta de logs
+# Nome do serviço reportado nos traces (Tempo)
 OTEL_SERVICE_NAME=homelab-api
 
 # Taxa de erros simulados na API (0.0 a 1.0)
@@ -501,9 +501,9 @@ Alertas provisionados:
 - Disco raiz acima de 85%.
 - Memória disponível abaixo de 10%.
 - Ingestão de traces parada (Tempo sem spans há 15 min).
-- Ingestão de logs parada (Loki sem logs do serviço há 15 min).
+- Ingestão de logs parada (Loki sem logs do container `api` há 15 min).
 
-Os dois últimos cobrem falhas silenciosas de telemetria, em que a API continua de pé mas para de mandar traces/logs. O alerta de logs lê o nome do serviço de forma dinâmica a partir de `OTEL_SERVICE_NAME` no `.env`.
+Os dois últimos cobrem falhas silenciosas de telemetria, em que a API continua de pé mas para de mandar traces/logs. O alerta de logs observa os logs do container `api` no Loki (`{container="api"}`), o mesmo label usado no Explore.
 
 ## A API de exemplo
 
@@ -580,6 +580,8 @@ df -h /
 docker system df
 ```
 
+As imagens estão fixadas em versões específicas no `docker-compose.yml` para builds reproduzíveis (uma versão `latest` pode trazer mudança de schema de config que quebra a subida). Por isso `docker compose pull` só atualiza dentro da mesma tag; para subir de versão, edite a tag da imagem no compose e depois rode `docker compose pull && docker compose up -d`.
+
 Ver logs:
 
 ```bash
@@ -645,6 +647,8 @@ Para apenas reiniciar, troque o comando por `reboot`. O comportamento por SSH é
 │       ├── alerting/
 │       ├── dashboards/
 │       └── datasources/
+├── loki/
+│   └── loki-config.yml       # config do Loki com retenção de 7 dias
 ├── prometheus/
 │   └── prometheus.yml
 ├── promtail/
@@ -721,6 +725,9 @@ Se `local-blocks` não aparecer ativo, revise `tempo/tempo.yaml`.
 
 ### A box fica sem memória
 
+Cada serviço já tem um `mem_limit` no `docker-compose.yml`, dimensionado para uma box de 2–4 GB, para que um pico em um container não derrube os demais (nem corrompa os bancos). Se ainda faltar memória:
+
+- Reduza os `mem_limit` dos serviços mais pesados (Prometheus, Tempo, Loki, Grafana) ou suba os limites se a box tiver folga de RAM.
 - Em `docker-compose.yml`, reduza `--storage.tsdb.retention.time=30d` para `15d` ou `7d`.
 - Aumente `REQUEST_INTERVAL_MS` no `.env` para gerar menos tráfego (e menos traces/logs).
 - Pause o gerador quando não estiver explorando dados: `docker compose stop generator`.
@@ -732,5 +739,5 @@ docker system df -v
 du -h -d 1 /var/lib/docker/volumes | sort -h
 ```
 
-Reduza a retenção do Prometheus e a intensidade do gerador. Para Loki, avalie configurar retenção explícita se os logs crescerem demais.
+O Prometheus retém 30 dias (`--storage.tsdb.retention.time`), e Loki e Tempo já vêm com retenção de 7 dias configurada em `loki/loki-config.yml` (`retention_period: 168h`) e `tempo/tempo.yaml` (`block_retention: 168h`). Para apertar mais, reduza esses valores e a intensidade do gerador.
 ```

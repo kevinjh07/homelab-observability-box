@@ -1,4 +1,5 @@
 import express from "express";
+import type { ErrorRequestHandler } from "express";
 import { collectDefaultMetrics, Histogram, Registry } from "prom-client";
 import { requestLogger } from "./middleware/logger";
 import { buildMetricsMiddleware } from "./middleware/metrics";
@@ -32,7 +33,31 @@ app.use(productsRouter);
 app.use(ordersRouter);
 app.use(searchRouter);
 
+// Error handler: garante resposta 500 padronizada (ex.: JSON malformado no body)
+// em vez da página de erro default do Express.
+const errorHandler: ErrorRequestHandler = (err, _req, res, _next) => {
+  console.error(
+    JSON.stringify({
+      level: "error",
+      msg: "unhandled error",
+      error: err instanceof Error ? err.message : String(err),
+    })
+  );
+  if (res.headersSent) return;
+  res.status(500).json({ error: "internal server error" });
+};
+app.use(errorHandler);
+
 const port = parseInt(process.env.PORT ?? "3000", 10);
-app.listen(port, () => {
+const server = app.listen(port, () => {
   console.log(JSON.stringify({ level: "info", msg: "server started", port }));
 });
+
+// Shutdown limpo: para de aceitar conexões e encerra ao receber sinal do Docker,
+// evitando requisições cortadas no meio em `docker compose down`.
+function shutdown(signal: string): void {
+  console.log(JSON.stringify({ level: "info", msg: "shutting down", signal }));
+  server.close(() => process.exit(0));
+}
+process.on("SIGTERM", () => shutdown("SIGTERM"));
+process.on("SIGINT", () => shutdown("SIGINT"));

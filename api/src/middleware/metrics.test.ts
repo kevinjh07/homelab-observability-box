@@ -43,7 +43,7 @@ describe("buildMetricsMiddleware", () => {
     expect(labels.status_code).toBe("200");
   });
 
-  it("uses request path when route is unavailable", () => {
+  it('uses "unmatched" when no route matched', () => {
     let finishCallback: (() => void) | undefined;
     const res = {
       statusCode: 404,
@@ -58,6 +58,6 @@ describe("buildMetricsMiddleware", () => {
     finishCallback?.();
 
     const [labels] = observe.mock.calls[0] as [Record<string, string>, number];
-    expect(labels.route).toBe("/unknown");
+    expect(labels.route).toBe("unmatched");
   });
 });

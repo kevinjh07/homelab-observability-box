@@ -2,14 +2,13 @@ import { Router } from "express";
 import type { Request, Response } from "express";
 import { simulateDelay } from "../lib/simulateDelay";
 import { shouldFail } from "../lib/simulateError";
+import { errorRate } from "../lib/errorRate";
 
 export const productsRouter = Router();
 
-const ERROR_RATE = parseFloat(process.env.ERROR_RATE ?? "0.05");
-
 productsRouter.get("/products", async (_req: Request, res: Response): Promise<void> => {
   await simulateDelay(20, 70);
-  if (shouldFail(ERROR_RATE * 0.5)) {
+  if (shouldFail(errorRate * 0.5)) {
     res.status(500).json({ error: "internal server error" });
     return;
   }
@@ -21,7 +20,7 @@ productsRouter.get("/products", async (_req: Request, res: Response): Promise<vo
 
 productsRouter.get("/products/:id", async (req: Request, res: Response): Promise<void> => {
   await simulateDelay(10, 40);
-  if (shouldFail(ERROR_RATE * 0.5)) {
+  if (shouldFail(errorRate * 0.5)) {
     res.status(500).json({ error: "internal server error" });
     return;
   }
