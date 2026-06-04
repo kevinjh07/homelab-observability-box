@@ -1,5 +1,13 @@
 .env
+
+# Dependências
+node_modules/
 api/node_modules/
+generator/node_modules/
+
+# Artefatos de build e testes
 api/dist/
 api/coverage/
-generator/node_modules/
+
+# Caches de tooling
+.eslintcache

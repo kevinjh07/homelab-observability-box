@@ -7,11 +7,7 @@ function resolveLogLevel(statusCode: number): "info" | "warn" | "error" {
   return "info";
 }
 
-export function requestLogger(
-  req: Request,
-  res: Response,
-  next: NextFunction
-): void {
+export function requestLogger(req: Request, res: Response, next: NextFunction): void {
   const startedAt = Date.now();
 
   res.on("finish", () => {
@@ -25,7 +21,7 @@ export function requestLogger(
         route: req.path,
         statusCode: res.statusCode,
         durationMs,
-      })
+      }),
     );
   });
 

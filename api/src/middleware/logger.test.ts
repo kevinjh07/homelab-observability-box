@@ -3,10 +3,10 @@ import type { Request, Response, NextFunction } from "express";
 import { requestLogger } from "./logger";
 
 const buildReq = (overrides: Partial<Request> = {}): Request =>
-  ({ method: "GET", path: "/users", ...overrides } as Request);
+  ({ method: "GET", path: "/users", ...overrides }) as Request;
 
 const buildRes = (statusCode = 200): Response =>
-  ({ statusCode, on: vi.fn() } as unknown as Response);
+  ({ statusCode, on: vi.fn() }) as unknown as Response;
 
 describe("requestLogger", () => {
   beforeEach(() => {
@@ -35,7 +35,7 @@ describe("requestLogger", () => {
 
     expect(console.log).toHaveBeenCalledOnce();
     const logged = JSON.parse(
-      (console.log as ReturnType<typeof vi.fn>).mock.calls[0][0] as string
+      (console.log as ReturnType<typeof vi.fn>).mock.calls[0][0] as string,
     ) as Record<string, unknown>;
     expect(logged.method).toBe("GET");
     expect(logged.route).toBe("/users");
@@ -55,7 +55,7 @@ describe("requestLogger", () => {
     finishCallback?.();
 
     const logged = JSON.parse(
-      (console.log as ReturnType<typeof vi.fn>).mock.calls[0][0] as string
+      (console.log as ReturnType<typeof vi.fn>).mock.calls[0][0] as string,
     ) as Record<string, unknown>;
     expect(logged.level).toBe("error");
   });
@@ -73,7 +73,7 @@ describe("requestLogger", () => {
     finishCallback?.();
 
     const logged = JSON.parse(
-      (console.log as ReturnType<typeof vi.fn>).mock.calls[0][0] as string
+      (console.log as ReturnType<typeof vi.fn>).mock.calls[0][0] as string,
     ) as Record<string, unknown>;
     expect(logged.level).toBe("warn");
   });
@@ -91,7 +91,7 @@ describe("requestLogger", () => {
     finishCallback?.();
 
     const logged = JSON.parse(
-      (console.log as ReturnType<typeof vi.fn>).mock.calls[0][0] as string
+      (console.log as ReturnType<typeof vi.fn>).mock.calls[0][0] as string,
     ) as Record<string, unknown>;
     expect(logged.level).toBe("info");
   });

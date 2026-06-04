@@ -37,10 +37,10 @@ services:
     container_name: prometheus
     restart: unless-stopped
     command:
-      - '--config.file=/etc/prometheus/prometheus.yml'
-      - '--storage.tsdb.path=/prometheus'
-      - '--storage.tsdb.retention.time=30d'
-      - '--web.enable-remote-write-receiver'
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--storage.tsdb.retention.time=30d"
+      - "--web.enable-remote-write-receiver"
     volumes:
       - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
       - prometheus-data:/prometheus
@@ -53,10 +53,10 @@ services:
     container_name: node-exporter
     restart: unless-stopped
     command:
-      - '--path.rootfs=/host'
+      - "--path.rootfs=/host"
     pid: host
     volumes:
-      - '/:/host:ro,rslave'
+      - "/:/host:ro,rslave"
     mem_limit: 64m
 
   cadvisor:

@@ -17,7 +17,7 @@ describe("recordMetric", () => {
 
     expect(observe).toHaveBeenCalledWith(
       { method: "GET", route: "/users", status_code: "200" },
-      0.15
+      0.15,
     );
   });
 
@@ -35,7 +35,7 @@ describe("recordMetric", () => {
 
     expect(observe).toHaveBeenCalledWith(
       expect.objectContaining({ status_code: "500" }),
-      expect.any(Number)
+      expect.any(Number),
     );
   });
 });

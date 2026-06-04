@@ -1,0 +1,8 @@
+# Dependências e artefatos
+**/node_modules/
+**/dist/
+**/coverage/
+
+# Lockfiles (não reformatar)
+package-lock.json
+**/package-lock.json

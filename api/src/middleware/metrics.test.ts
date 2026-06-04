@@ -4,7 +4,7 @@ import type { Histogram } from "prom-client";
 import { buildMetricsMiddleware } from "./metrics";
 
 const buildReq = (overrides: Partial<Request> = {}): Request =>
-  ({ method: "GET", route: { path: "/users" }, ...overrides } as Request);
+  ({ method: "GET", route: { path: "/users" }, ...overrides }) as Request;
 
 describe("buildMetricsMiddleware", () => {
   let observe: ReturnType<typeof vi.fn>;

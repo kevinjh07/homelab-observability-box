@@ -1,9 +1,9 @@
 apiVersion: 1
 
 providers:
-  - name: 'generic'
+  - name: "generic"
     orgId: 1
-    folder: 'Home Lab'
+    folder: "Home Lab"
     type: file
     disableDeletion: false
     updateIntervalSeconds: 30

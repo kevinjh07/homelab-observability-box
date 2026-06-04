@@ -13,11 +13,19 @@ const { hostname, port, protocol } = new URL(BASE_URL);
 const weightedRoutes = [
   ...Array(25).fill({ method: "GET", path: "/users" }),
   ...Array(15).fill({ method: "GET", path: "/users/1" }),
-  ...Array(5).fill({ method: "POST", path: "/users", body: JSON.stringify({ name: "test", email: "test@example.com" }) }),
+  ...Array(5).fill({
+    method: "POST",
+    path: "/users",
+    body: JSON.stringify({ name: "test", email: "test@example.com" }),
+  }),
   ...Array(15).fill({ method: "GET", path: "/products" }),
   ...Array(10).fill({ method: "GET", path: "/products/1" }),
   ...Array(20).fill({ method: "GET", path: "/orders" }),
-  ...Array(5).fill({ method: "POST", path: "/orders", body: JSON.stringify({ productId: 1, quantity: 1 }) }),
+  ...Array(5).fill({
+    method: "POST",
+    path: "/orders",
+    body: JSON.stringify({ productId: 1, quantity: 1 }),
+  }),
   ...Array(5).fill({ method: "GET", path: "/search?q=homelab" }),
 ];
 
@@ -43,19 +51,33 @@ function fireRequest(route) {
     res.resume();
     res.on("end", () => {
       process.stdout.write(
-        JSON.stringify({ ts: new Date().toISOString(), method: route.method, path: route.path, status: res.statusCode }) + "\n"
+        JSON.stringify({
+          ts: new Date().toISOString(),
+          method: route.method,
+          path: route.path,
+          status: res.statusCode,
+        }) + "\n",
       );
     });
   });
 
   req.on("error", (err) => {
-    process.stderr.write(JSON.stringify({ ts: new Date().toISOString(), error: err.message }) + "\n");
+    process.stderr.write(
+      JSON.stringify({ ts: new Date().toISOString(), error: err.message }) + "\n",
+    );
   });
 
   if (route.body) req.write(route.body);
   req.end();
 }
 
-console.log(JSON.stringify({ level: "info", msg: "generator started", base_url: BASE_URL, interval_ms: INTERVAL_MS }));
+console.log(
+  JSON.stringify({
+    level: "info",
+    msg: "generator started",
+    base_url: BASE_URL,
+    interval_ms: INTERVAL_MS,
+  }),
+);
 
 setInterval(() => fireRequest(pickRoute()), INTERVAL_MS);

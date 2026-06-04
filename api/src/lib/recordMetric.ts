@@ -15,6 +15,6 @@ export function recordMetric(input: MetricInput): void {
       route: input.route,
       status_code: String(input.statusCode),
     },
-    input.durationMs / 1000
+    input.durationMs / 1000,
   );
 }

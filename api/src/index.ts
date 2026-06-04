@@ -41,7 +41,7 @@ const errorHandler: ErrorRequestHandler = (err, _req, res, _next) => {
       level: "error",
       msg: "unhandled error",
       error: err instanceof Error ? err.message : String(err),
-    })
+    }),
   );
   if (res.headersSent) return;
   res.status(500).json({ error: "internal server error" });

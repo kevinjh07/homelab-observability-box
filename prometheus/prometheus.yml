@@ -6,22 +6,22 @@ scrape_configs:
   # O próprio Prometheus
   - job_name: prometheus
     static_configs:
-      - targets: ['localhost:9090']
+      - targets: ["localhost:9090"]
 
   # Saúde do host (CPU, RAM, disco)
   - job_name: node
     static_configs:
-      - targets: ['node-exporter:9100']
+      - targets: ["node-exporter:9100"]
 
   # Métricas por container da stack
   - job_name: cadvisor
     static_configs:
-      - targets: ['cadvisor:8080']
+      - targets: ["cadvisor:8080"]
 
   # Métricas da API (prom-client) — sem autenticação, HTTP simples
   - job_name: api
     static_configs:
-      - targets: ['api:3000']
+      - targets: ["api:3000"]
 
   # Sonda HTTP dos endpoints da API (up/down, latência)
   - job_name: blackbox-http

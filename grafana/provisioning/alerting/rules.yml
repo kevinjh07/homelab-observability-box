@@ -18,25 +18,25 @@ groups:
         execErrState: Error
         data:
           - refId: A
-            relativeTimeRange: {from: 300, to: 0}
+            relativeTimeRange: { from: 300, to: 0 }
             datasourceUid: prometheus
             model:
-              datasource: {type: prometheus, uid: prometheus}
+              datasource: { type: prometheus, uid: prometheus }
               expr: 'probe_success{endpoint_type="root"}'
               instant: true
               refId: A
           - refId: C
             datasourceUid: __expr__
             model:
-              datasource: {type: __expr__, uid: __expr__}
+              datasource: { type: __expr__, uid: __expr__ }
               type: classic_conditions
               refId: C
               conditions:
                 - type: query
-                  evaluator: {type: lt, params: [1]}
-                  operator: {type: and}
-                  query: {params: [A]}
-                  reducer: {type: last, params: []}
+                  evaluator: { type: lt, params: [1] }
+                  operator: { type: and }
+                  query: { params: [A] }
+                  reducer: { type: last, params: [] }
 
       - uid: alert-api-ready
         title: API readiness degradada
@@ -50,25 +50,25 @@ groups:
         execErrState: Error
         data:
           - refId: A
-            relativeTimeRange: {from: 300, to: 0}
+            relativeTimeRange: { from: 300, to: 0 }
             datasourceUid: prometheus
             model:
-              datasource: {type: prometheus, uid: prometheus}
+              datasource: { type: prometheus, uid: prometheus }
               expr: 'probe_success{endpoint_type="ready"}'
               instant: true
               refId: A
           - refId: C
             datasourceUid: __expr__
             model:
-              datasource: {type: __expr__, uid: __expr__}
+              datasource: { type: __expr__, uid: __expr__ }
               type: classic_conditions
               refId: C
               conditions:
                 - type: query
-                  evaluator: {type: lt, params: [1]}
-                  operator: {type: and}
-                  query: {params: [A]}
-                  reducer: {type: last, params: []}
+                  evaluator: { type: lt, params: [1] }
+                  operator: { type: and }
+                  query: { params: [A] }
+                  reducer: { type: last, params: [] }
 
       - uid: alert-api-5xx
         title: Taxa de erro 5xx alta (> 5%)
@@ -82,25 +82,25 @@ groups:
         execErrState: OK
         data:
           - refId: A
-            relativeTimeRange: {from: 600, to: 0}
+            relativeTimeRange: { from: 600, to: 0 }
             datasourceUid: prometheus
             model:
-              datasource: {type: prometheus, uid: prometheus}
+              datasource: { type: prometheus, uid: prometheus }
               expr: '100 * sum(rate(http_request_duration_seconds_count{status_code=~"5.."}[5m])) / clamp_min(sum(rate(http_request_duration_seconds_count[5m])), 1)'
               instant: true
               refId: A
           - refId: C
             datasourceUid: __expr__
             model:
-              datasource: {type: __expr__, uid: __expr__}
+              datasource: { type: __expr__, uid: __expr__ }
               type: classic_conditions
               refId: C
               conditions:
                 - type: query
-                  evaluator: {type: gt, params: [5]}
-                  operator: {type: and}
-                  query: {params: [A]}
-                  reducer: {type: last, params: []}
+                  evaluator: { type: gt, params: [5] }
+                  operator: { type: and }
+                  query: { params: [A] }
+                  reducer: { type: last, params: [] }
 
       - uid: alert-api-latency
         title: Latência p95 alta (> 1s)
@@ -114,25 +114,25 @@ groups:
         execErrState: OK
         data:
           - refId: A
-            relativeTimeRange: {from: 600, to: 0}
+            relativeTimeRange: { from: 600, to: 0 }
             datasourceUid: prometheus
             model:
-              datasource: {type: prometheus, uid: prometheus}
-              expr: 'histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket[5m])) by (le))'
+              datasource: { type: prometheus, uid: prometheus }
+              expr: "histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket[5m])) by (le))"
               instant: true
               refId: A
           - refId: C
             datasourceUid: __expr__
             model:
-              datasource: {type: __expr__, uid: __expr__}
+              datasource: { type: __expr__, uid: __expr__ }
               type: classic_conditions
               refId: C
               conditions:
                 - type: query
-                  evaluator: {type: gt, params: [1]}
-                  operator: {type: and}
-                  query: {params: [A]}
-                  reducer: {type: last, params: []}
+                  evaluator: { type: gt, params: [1] }
+                  operator: { type: and }
+                  query: { params: [A] }
+                  reducer: { type: last, params: [] }
 
   - orgId: 1
     name: box
@@ -151,25 +151,25 @@ groups:
         execErrState: OK
         data:
           - refId: A
-            relativeTimeRange: {from: 300, to: 0}
+            relativeTimeRange: { from: 300, to: 0 }
             datasourceUid: prometheus
             model:
-              datasource: {type: prometheus, uid: prometheus}
+              datasource: { type: prometheus, uid: prometheus }
               expr: '100 - (node_filesystem_avail_bytes{mountpoint="/",fstype!="tmpfs"} / node_filesystem_size_bytes{mountpoint="/",fstype!="tmpfs"} * 100)'
               instant: true
               refId: A
           - refId: C
             datasourceUid: __expr__
             model:
-              datasource: {type: __expr__, uid: __expr__}
+              datasource: { type: __expr__, uid: __expr__ }
               type: classic_conditions
               refId: C
               conditions:
                 - type: query
-                  evaluator: {type: gt, params: [85]}
-                  operator: {type: and}
-                  query: {params: [A]}
-                  reducer: {type: last, params: []}
+                  evaluator: { type: gt, params: [85] }
+                  operator: { type: and }
+                  query: { params: [A] }
+                  reducer: { type: last, params: [] }
 
       - uid: alert-box-mem
         title: Memória disponível do host baixa (< 10%)
@@ -183,25 +183,25 @@ groups:
         execErrState: OK
         data:
           - refId: A
-            relativeTimeRange: {from: 300, to: 0}
+            relativeTimeRange: { from: 300, to: 0 }
             datasourceUid: prometheus
             model:
-              datasource: {type: prometheus, uid: prometheus}
-              expr: 'node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes * 100'
+              datasource: { type: prometheus, uid: prometheus }
+              expr: "node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes * 100"
               instant: true
               refId: A
           - refId: C
             datasourceUid: __expr__
             model:
-              datasource: {type: __expr__, uid: __expr__}
+              datasource: { type: __expr__, uid: __expr__ }
               type: classic_conditions
               refId: C
               conditions:
                 - type: query
-                  evaluator: {type: lt, params: [10]}
-                  operator: {type: and}
-                  query: {params: [A]}
-                  reducer: {type: last, params: []}
+                  evaluator: { type: lt, params: [10] }
+                  operator: { type: and }
+                  query: { params: [A] }
+                  reducer: { type: last, params: [] }
 
   - orgId: 1
     name: telemetria
@@ -220,25 +220,25 @@ groups:
         execErrState: Error
         data:
           - refId: A
-            relativeTimeRange: {from: 900, to: 0}
+            relativeTimeRange: { from: 900, to: 0 }
             datasourceUid: prometheus
             model:
-              datasource: {type: prometheus, uid: prometheus}
-              expr: 'sum(rate(traces_spanmetrics_calls_total[15m]))'
+              datasource: { type: prometheus, uid: prometheus }
+              expr: "sum(rate(traces_spanmetrics_calls_total[15m]))"
               instant: true
               refId: A
           - refId: C
             datasourceUid: __expr__
             model:
-              datasource: {type: __expr__, uid: __expr__}
+              datasource: { type: __expr__, uid: __expr__ }
               type: classic_conditions
               refId: C
               conditions:
                 - type: query
-                  evaluator: {type: lt, params: [0.001]}
-                  operator: {type: and}
-                  query: {params: [A]}
-                  reducer: {type: last, params: []}
+                  evaluator: { type: lt, params: [0.001] }
+                  operator: { type: and }
+                  query: { params: [A] }
+                  reducer: { type: last, params: [] }
 
       - uid: alert-logs-stopped
         title: Ingestão de logs parada
@@ -252,22 +252,22 @@ groups:
         execErrState: Error
         data:
           - refId: A
-            relativeTimeRange: {from: 900, to: 0}
+            relativeTimeRange: { from: 900, to: 0 }
             datasourceUid: loki
             model:
-              datasource: {type: loki, uid: loki}
+              datasource: { type: loki, uid: loki }
               expr: 'sum(count_over_time({container="api"} [15m]))'
               queryType: instant
               refId: A
           - refId: C
             datasourceUid: __expr__
             model:
-              datasource: {type: __expr__, uid: __expr__}
+              datasource: { type: __expr__, uid: __expr__ }
               type: classic_conditions
               refId: C
               conditions:
                 - type: query
-                  evaluator: {type: lt, params: [0.001]}
-                  operator: {type: and}
-                  query: {params: [A]}
-                  reducer: {type: last, params: []}
+                  evaluator: { type: lt, params: [0.001] }
+                  operator: { type: and }
+                  query: { params: [A] }
+                  reducer: { type: last, params: [] }

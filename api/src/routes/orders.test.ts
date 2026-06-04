@@ -28,9 +28,7 @@ describe("GET /orders", () => {
 
 describe("POST /orders", () => {
   it("returns 201 with created order", async () => {
-    const res = await request(app)
-      .post("/orders")
-      .send({ productId: 1, quantity: 2 });
+    const res = await request(app).post("/orders").send({ productId: 1, quantity: 2 });
     expect(res.status).toBe(201);
     const body = res.body as Record<string, unknown>;
     expect(typeof body.id).toBe("number");
@@ -40,9 +38,7 @@ describe("POST /orders", () => {
   it("returns 500 when error is injected", async () => {
     const { shouldFail } = await import("../lib/simulateError");
     vi.mocked(shouldFail).mockReturnValueOnce(true);
-    const res = await request(app)
-      .post("/orders")
-      .send({ productId: 1, quantity: 2 });
+    const res = await request(app).post("/orders").send({ productId: 1, quantity: 2 });
     expect(res.status).toBe(500);
   });
 });

@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeAll } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import express from "express";
 import request from "supertest";
 
@@ -56,9 +56,7 @@ describe("POST /users", () => {
   it("returns 500 when error is injected", async () => {
     const { shouldFail } = await import("../lib/simulateError");
     vi.mocked(shouldFail).mockReturnValueOnce(true);
-    const res = await request(app)
-      .post("/users")
-      .send({ name: "Bob", email: "bob@example.com" });
+    const res = await request(app).post("/users").send({ name: "Bob", email: "bob@example.com" });
     expect(res.status).toBe(500);
   });
 });

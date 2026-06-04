@@ -15,8 +15,7 @@ describe("simulateDelay", () => {
     const promise = simulateDelay(50, 100);
     vi.runAllTimers();
     await promise;
-    const delay = (setTimeout as unknown as ReturnType<typeof vi.fn>).mock
-      .calls[0][1] as number;
+    const delay = (setTimeout as unknown as ReturnType<typeof vi.fn>).mock.calls[0][1] as number;
     expect(delay).toBeGreaterThanOrEqual(50);
     expect(delay).toBeLessThanOrEqual(100);
   });
@@ -26,8 +25,7 @@ describe("simulateDelay", () => {
     const promise = simulateDelay(75, 75);
     vi.runAllTimers();
     await promise;
-    const delay = (setTimeout as unknown as ReturnType<typeof vi.fn>).mock
-      .calls[0][1] as number;
+    const delay = (setTimeout as unknown as ReturnType<typeof vi.fn>).mock.calls[0][1] as number;
     expect(delay).toBe(75);
   });
 });

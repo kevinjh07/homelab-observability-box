@@ -7,7 +7,7 @@ const DEFAULT_ERROR_RATE = 0.05;
  */
 export function parseErrorRate(
   value: string | undefined,
-  fallback: number = DEFAULT_ERROR_RATE
+  fallback: number = DEFAULT_ERROR_RATE,
 ): number {
   if (value === undefined) return fallback;
   const parsed = Number.parseFloat(value);
