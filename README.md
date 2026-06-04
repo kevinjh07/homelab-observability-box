@@ -388,10 +388,10 @@ O `docker-compose.yml` publica Grafana e a API em todas as interfaces (`0.0.0.0`
 
 Acesso direto pela LAN, trocando `BOX_IP` pelo IP da box:
 
-| Serviço | URL |
-| --- | --- |
-| Grafana | `http://BOX_IP:3000` (login `admin` / sua senha) |
-| API de exemplo | `http://BOX_IP:3001` |
+| Serviço        | URL                                              |
+| -------------- | ------------------------------------------------ |
+| Grafana        | `http://BOX_IP:3000` (login `admin` / sua senha) |
+| API de exemplo | `http://BOX_IP:3001`                             |
 
 Para o Prometheus, ou para acessar tudo de forma mais fechada, use um SSH tunnel a partir da sua máquina:
 
@@ -509,18 +509,18 @@ Os dois últimos cobrem falhas silenciosas de telemetria, em que a API continua 
 
 A API mora em `api/` e expõe rotas que cobrem o que o Grafana precisa para os dashboards. Cada rota simula uma latência variável e uma taxa de erro 5xx, para os gráficos terem movimento:
 
-| Método | Rota | Latência | Taxa de erro |
-|---|---|---|---|
-| GET | `/` `/ready` `/health` | < 15 ms | 0% |
-| GET | `/metrics` | — | 0% (formato Prometheus) |
-| GET | `/users` | 30–100 ms | ~5% |
-| GET | `/users/:id` | 15–50 ms | ~2.5% |
-| POST | `/users` | 100–300 ms | ~10% |
-| GET | `/products` | 20–70 ms | ~2.5% |
-| GET | `/products/:id` | 10–40 ms | ~2.5% |
-| GET | `/orders` | 80–250 ms | ~5% |
-| POST | `/orders` | 150–400 ms | ~10% |
-| GET | `/search?q=` | 50–600 ms | ~5% |
+| Método | Rota                   | Latência   | Taxa de erro            |
+| ------ | ---------------------- | ---------- | ----------------------- |
+| GET    | `/` `/ready` `/health` | < 15 ms    | 0%                      |
+| GET    | `/metrics`             | —          | 0% (formato Prometheus) |
+| GET    | `/users`               | 30–100 ms  | ~5%                     |
+| GET    | `/users/:id`           | 15–50 ms   | ~2.5%                   |
+| POST   | `/users`               | 100–300 ms | ~10%                    |
+| GET    | `/products`            | 20–70 ms   | ~2.5%                   |
+| GET    | `/products/:id`        | 10–40 ms   | ~2.5%                   |
+| GET    | `/orders`              | 80–250 ms  | ~5%                     |
+| POST   | `/orders`              | 150–400 ms | ~10%                    |
+| GET    | `/search?q=`           | 50–600 ms  | ~5%                     |
 
 Métricas expostas em `/metrics`: o histograma `http_request_duration_seconds` (com labels `method`, `route`, `status_code`) e as métricas padrão do Node via `prom-client` (`process_resident_memory_bytes`, `nodejs_heap_size_used_bytes`, `nodejs_eventloop_lag_p99_seconds`, entre outras).
 
@@ -655,6 +655,11 @@ Para apenas reiniciar, troque o comando por `reboot`. O comportamento por SSH é
 │   └── promtail-config.yml
 ├── tempo/
 │   └── tempo.yaml
+├── .github/workflows/        # CI (lint, formatação, build, cobertura, compose)
+├── .husky/                   # hook de pre-commit (lint-staged)
+├── eslint.config.mjs         # ESLint (flat config) para TS e JS
+├── .prettierrc.json          # config do Prettier
+├── package.json              # tooling raiz (Prettier, ESLint, Husky)
 ├── .env.example
 └── .gitignore
 ```
@@ -740,4 +745,11 @@ du -h -d 1 /var/lib/docker/volumes | sort -h
 ```
 
 O Prometheus retém 30 dias (`--storage.tsdb.retention.time`), e Loki e Tempo já vêm com retenção de 7 dias configurada em `loki/loki-config.yml` (`retention_period: 168h`) e `tempo/tempo.yaml` (`block_retention: 168h`). Para apertar mais, reduza esses valores e a intensidade do gerador.
-```
+
+## Contribuindo
+
+Contribuições são bem-vindas. Veja o [CONTRIBUTING.md](CONTRIBUTING.md) para o fluxo de desenvolvimento, como rodar os testes (a API mantém 100% de cobertura) e o padrão de commits. Ao participar, você concorda com o [Código de Conduta](CODE_OF_CONDUCT.md). Para reportar problemas de segurança, veja a [política de segurança](SECURITY.md).
+
+## Licença
+
+Distribuído sob a licença [MIT](LICENSE).
