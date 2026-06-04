@@ -572,7 +572,7 @@ docker compose up -d --build api
 Parar, atualizar imagens de base e ver uso de disco:
 
 ```bash
-docker compose down
+docker compose stop
 docker compose pull
 docker compose up -d
 docker image prune -f
@@ -595,10 +595,10 @@ Backup simples dos dados do Grafana e Prometheus:
 
 ```bash
 cd /opt/homelab-observability
-docker compose down
+docker compose stop
 docker run --rm -v homelab-observability_grafana-data:/data -v "$PWD:/backup" alpine tar czf /backup/grafana-data.tgz -C /data .
 docker run --rm -v homelab-observability_prometheus-data:/data -v "$PWD:/backup" alpine tar czf /backup/prometheus-data.tgz -C /data .
-docker compose up -d
+docker compose start
 ```
 
 ## Desligar e reiniciar a box com segurança
@@ -609,7 +609,7 @@ Pare a stack antes de desligar, para que os bancos fechem com integridade, e ent
 
 ```bash
 cd /opt/homelab-observability
-docker compose down
+docker compose stop
 poweroff
 ```
 
