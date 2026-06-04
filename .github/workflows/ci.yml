@@ -21,7 +21,7 @@ jobs:
       - name: Instalar tooling
         run: npm ci
 
-      - name: Prettier (check)
+      - name: Verificar formatação (Prettier)
         run: npm run format:check
 
       - name: ESLint
@@ -45,7 +45,7 @@ jobs:
       - name: Instalar dependências
         run: npm ci
 
-      - name: Type-check + build
+      - name: Verificação de tipos e build
         run: npm run build
 
       - name: Testes + cobertura (100% exigido)
