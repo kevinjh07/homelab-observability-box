@@ -10,13 +10,14 @@ Clareza e simplicidade valem mais do que sofisticação aqui — tenha isso em m
 
 ## Configurando o ambiente
 
-Na **raiz** do repositório ficam o Prettier, o ESLint e o Husky, que padronizam formatação e lint de todo o projeto (TypeScript da API, JavaScript do gerador e os arquivos de config). Instale o tooling uma vez:
+Use **Node 24** (LTS; veja `.nvmrc`). Na **raiz** do repositório ficam o Prettier, o ESLint e o Husky, que padronizam formatação e lint de todo o projeto (TypeScript da API, JavaScript do gerador e os arquivos de config). Instale o tooling uma vez:
 
 ```bash
 npm install
+npm run prepare   # ativa os hooks do Husky
 ```
 
-Isso também ativa o hook de Git via Husky. A partir daí, todo `git commit` roda o **lint-staged**, que aplica `eslint --fix` e `prettier --write` apenas nos arquivos alterados — se o ESLint encontrar um erro que não dá para corrigir automaticamente, o commit é bloqueado.
+O passo `prepare` é manual porque o `.npmrc` usa `ignore-scripts=true` (proteção de supply chain). A partir daí, todo `git commit` roda o **lint-staged**, que aplica `eslint --fix` e `prettier --write` apenas nos arquivos alterados — se o ESLint encontrar um erro que não dá para corrigir automaticamente, o commit é bloqueado.
 
 Comandos úteis (na raiz):
 
