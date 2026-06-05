@@ -63,7 +63,14 @@ services:
     image: gcr.io/cadvisor/cadvisor:v0.49.1
     container_name: cadvisor
     restart: unless-stopped
-    privileged: true
+    # Sem privileged: o cAdvisor roda com capability e mounts mínimos.
+    # Se faltar métrica em algum kernel, afrouxe nesta ordem: primeiro
+    # security_opt (apparmor), depois capabilities pontuais. Evite voltar
+    # ao privileged, que concede acesso de root ao host.
+    cap_add:
+      - SYS_PTRACE
+    security_opt:
+      - apparmor=unconfined
     devices:
       - /dev/kmsg
     volumes:
@@ -72,7 +79,7 @@ services:
       - /sys:/sys:ro
       - /var/lib/docker/:/var/lib/docker:ro
       - /dev/disk/:/dev/disk:ro
-    mem_limit: 256m
+    mem_limit: 192m
 
   blackbox-exporter:
     image: prom/blackbox-exporter:v0.25.0
@@ -102,6 +109,20 @@ services:
       - tempo-data:/var/tempo
     mem_limit: 512m
 
+  # Proxy somente-leitura na frente do socket do Docker. O Promtail fala com
+  # ele (tcp://dockerproxy:2375) em vez de montar /var/run/docker.sock direto,
+  # reduzindo a superfície de escalonamento para root no host.
+  dockerproxy:
+    image: tecnativa/docker-socket-proxy:0.3.0
+    container_name: dockerproxy
+    restart: unless-stopped
+    environment:
+      CONTAINERS: 1
+      POST: 0
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    mem_limit: 32m
+
   promtail:
     image: grafana/promtail:3.3.2
     container_name: promtail
@@ -110,7 +131,8 @@ services:
     volumes:
       - ./promtail/promtail-config.yml:/etc/promtail/config.yml:ro
       - /var/log:/var/log:ro
-      - /var/run/docker.sock:/var/run/docker.sock:ro
+    depends_on:
+      - dockerproxy
     mem_limit: 128m
 
   grafana:

@@ -27,7 +27,9 @@ flowchart LR
 
   host["Host Armbian"] -.-> node["node-exporter"]
   containers["Containers Docker"] -.-> cadvisor["cAdvisor"]
-  containers -.->|"/var/log e docker.sock"| promtail["Promtail"]
+  containers -.->|"/var/log"| promtail["Promtail"]
+  promtail -->|"descoberta read-only"| dockerproxy["docker-socket-proxy"]
+  dockerproxy -.->|"docker.sock"| containers
 
   prometheus["Prometheus"] -->|"scrape /metrics"| api
   prometheus -->|"scrape"| node
@@ -674,6 +676,8 @@ Este projeto é pensado para uma rede local de confiança. Ainda assim:
 - Use senha forte para o admin do Grafana no `.env`.
 - Mantenha o SSH acessível somente pela LAN ou por VPN.
 - Não há segredos de nuvem aqui, mas mesmo assim não versione o `.env`.
+- O `cAdvisor` roda **sem `privileged`** (apenas `cap_add: SYS_PTRACE` + mounts read-only); `privileged` daria acesso equivalente a root no host. Se faltar alguma métrica em um kernel específico, afrouxe gradualmente (primeiro `security_opt: apparmor=unconfined`, depois capabilities pontuais).
+- O `Promtail` descobre containers via `docker-socket-proxy` (somente leitura, `POST=0`), em vez de montar `/var/run/docker.sock` direto, reduzindo a superfície de escalonamento para root no host.
 
 ## Troubleshooting
 
@@ -730,7 +734,20 @@ Se `local-blocks` não aparecer ativo, revise `tempo/tempo.yaml`.
 
 ### A box fica sem memória
 
-Cada serviço já tem um `mem_limit` no `docker-compose.yml`, dimensionado para uma box de 2–4 GB, para que um pico em um container não derrube os demais (nem corrompa os bancos). Se ainda faltar memória:
+Cada serviço já tem um `mem_limit` no `docker-compose.yml`, dimensionado para uma box de 2–4 GB, para que um pico em um container não derrube os demais (nem corrompa os bancos). Um container morto por estouro aparece como `OOMKilled`:
+
+```bash
+docker inspect -f '{{.State.OOMKilled}}' loki
+docker stats --no-stream
+```
+
+Antes, confirme que o kernel aplica o limite — em alguns kernels ARM o cgroup memory não vem ligado no boot e o Docker **ignora o `mem_limit` silenciosamente**:
+
+```bash
+docker info | grep -i memory
+```
+
+Se aparecer `No memory limit support`, adicione `cgroup_enable=memory cgroup_memory=1` ao cmdline do boot (`/boot/armbianEnv.txt`) e reinicie. Se ainda faltar memória:
 
 - Reduza os `mem_limit` dos serviços mais pesados (Prometheus, Tempo, Loki, Grafana) ou suba os limites se a box tiver folga de RAM.
 - Em `docker-compose.yml`, reduza `--storage.tsdb.retention.time=30d` para `15d` ou `7d`.
