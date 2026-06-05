@@ -763,6 +763,8 @@ du -h -d 1 /var/lib/docker/volumes | sort -h
 
 O Prometheus retém 30 dias (`--storage.tsdb.retention.time`), e Loki e Tempo já vêm com retenção de 7 dias configurada em `loki/loki-config.yml` (`retention_period: 168h`) e `tempo/tempo.yaml` (`block_retention: 168h`). Para apertar mais, reduza esses valores e a intensidade do gerador.
 
+Os logs de container do Docker também são limitados por `logging` no `docker-compose.yml` (`max-size: 10m`, `max-file: 3`), evitando que `/var/lib/docker/containers` cresça sem teto.
+
 ## Contribuindo
 
 Contribuições são bem-vindas. Veja o [CONTRIBUTING.md](CONTRIBUTING.md) para o fluxo de desenvolvimento, como rodar os testes (a API mantém 100% de cobertura) e o padrão de commits. Ao participar, você concorda com o [Código de Conduta](CODE_OF_CONDUCT.md). Para reportar problemas de segurança, veja a [política de segurança](SECURITY.md).

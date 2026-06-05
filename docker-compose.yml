@@ -1,5 +1,15 @@
 name: homelab-observability
 
+# Limite de tamanho dos logs json-file de cada container. Sem isso, o driver
+# default cresce sem teto em /var/lib/docker/containers e pode encher o disco
+# (e ainda dá mais trabalho ao Promtail). Aplicado a todos os serviços abaixo
+# via âncora YAML.
+x-logging: &default-logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "3"
+
 services:
   api:
     build: ./api
@@ -13,6 +23,7 @@ services:
     ports:
       - "0.0.0.0:3001:3000"
     mem_limit: 256m
+    logging: *default-logging
     healthcheck:
       test: ["CMD", "wget", "-qO-", "http://localhost:3000/ready"]
       interval: 15s
@@ -31,6 +42,7 @@ services:
       api:
         condition: service_healthy
     mem_limit: 64m
+    logging: *default-logging
 
   prometheus:
     image: prom/prometheus:v3.1.0
@@ -47,6 +59,7 @@ services:
     ports:
       - "127.0.0.1:9090:9090"
     mem_limit: 512m
+    logging: *default-logging
 
   node-exporter:
     image: prom/node-exporter:v1.8.2
@@ -58,6 +71,7 @@ services:
     volumes:
       - "/:/host:ro,rslave"
     mem_limit: 64m
+    logging: *default-logging
 
   cadvisor:
     image: gcr.io/cadvisor/cadvisor:v0.49.1
@@ -80,6 +94,7 @@ services:
       - /var/lib/docker/:/var/lib/docker:ro
       - /dev/disk/:/dev/disk:ro
     mem_limit: 192m
+    logging: *default-logging
 
   blackbox-exporter:
     image: prom/blackbox-exporter:v0.25.0
@@ -88,6 +103,7 @@ services:
     volumes:
       - ./blackbox/blackbox.yml:/etc/blackbox_exporter/config.yml:ro
     mem_limit: 64m
+    logging: *default-logging
 
   loki:
     image: grafana/loki:3.3.2
@@ -98,6 +114,7 @@ services:
       - ./loki/loki-config.yml:/etc/loki/loki-config.yml:ro
       - loki-data:/loki
     mem_limit: 256m
+    logging: *default-logging
 
   tempo:
     image: grafana/tempo:2.7.1
@@ -108,6 +125,7 @@ services:
       - ./tempo/tempo.yaml:/etc/tempo/tempo.yaml:ro
       - tempo-data:/var/tempo
     mem_limit: 512m
+    logging: *default-logging
 
   # Proxy somente-leitura na frente do socket do Docker. O Promtail fala com
   # ele (tcp://dockerproxy:2375) em vez de montar /var/run/docker.sock direto,
@@ -122,6 +140,7 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
     mem_limit: 32m
+    logging: *default-logging
 
   promtail:
     image: grafana/promtail:3.3.2
@@ -134,6 +153,7 @@ services:
     depends_on:
       - dockerproxy
     mem_limit: 128m
+    logging: *default-logging
 
   grafana:
     image: grafana/grafana:11.4.0
@@ -150,6 +170,7 @@ services:
     ports:
       - "0.0.0.0:3000:3000"
     mem_limit: 384m
+    logging: *default-logging
     depends_on:
       - prometheus
       - loki
