@@ -1,8 +1,6 @@
 # Homelab Observability Box
 
-Projeto de home lab para transformar uma TV box Amlogic S905X3, Raspberry Pi ou outro hardware ARM64 em uma box de observabilidade com Grafana, Prometheus, Loki, Tempo, node-exporter, cAdvisor, blackbox-exporter e Promtail.
-
-A diferença para um setup de produção: aqui **tudo roda e fica acessível na própria rede local**. Não há Cloudflare, túneis nem domínios públicos. A própria stack já inclui uma **API de exemplo** (Node.js + Express + TypeScript) e um **gerador de tráfego**, então você vê dados reais no Grafana — métricas, logs e traces — em minutos, sem precisar conectar nenhum serviço externo.
+Projeto de home lab para transformar uma TV box Amlogic S905X3 em uma box de observabilidade com Grafana, Prometheus, Loki, Tempo, node-exporter, cAdvisor, blackbox-exporter e Promtail. A stack Docker funciona em qualquer hardware ARM64 compatível com Armbian, mas este guia foi validado apenas na T95 Max Plus (S905X3); outros dispositivos exigem adaptações na imagem do SO e no processo de boot.
 
 O objetivo é partir de um dispositivo limpo, instalar Armbian, subir a stack com Docker Compose e explorar os três pilares da observabilidade num ambiente fechado.
 
